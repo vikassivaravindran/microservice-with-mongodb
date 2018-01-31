@@ -1,0 +1,64 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: product-app
+  labels:
+    name: product-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: product-app
+  template:
+    metadata:
+      labels:
+        name: product-app
+    spec:
+      containers:
+      - name: product-app
+        image: hub.magellancloud.com/pes/product
+        imagePullPolicy: Always
+        name: product-app
+        resources:
+          limits:
+            cpu: 0.5
+            memory: 1Gi
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: prod
+      imagePullSecrets:
+      - name: magellanregistry
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-app
+  labels:
+    name: product-app
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  type: ClusterIP
+  selector:
+    name: product-app
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: product-app
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: product-app
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+

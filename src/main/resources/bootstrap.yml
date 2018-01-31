@@ -1,0 +1,12 @@
+# spring:
+#    application:
+#      name: productservice
+#    cloud:
+#      config:
+#        uri: http://config-server-test.magellancloud.com
+##        failFast: true
+#        username: platform
+#        password: platform
+#        retry: 
+##            max-attempts: 5
+##            max-interval: 60000
